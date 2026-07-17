@@ -102,14 +102,20 @@ class CrossrefCitationDoiHandler
     public function citationsChanged(string $hookName, array $args): bool
     {
         [$publicationId] = $args;
-        if (!$this->plugin->getEnabled() ||
-            !$this->plugin->hasCrossrefCredentials() ||
-            !$this->plugin->citationsEnabled()) {
-                return Hook::CONTINUE;
-        }
 
         $publication = Repo::publication()->get($publicationId);
+        if (!$publication) {
+            return Hook::CONTINUE;
+        }
         $submission = Repo::submission()->get($publication->getData('submissionId'));
+
+        if (!$submission ||
+            !$this->plugin->getEnabled($submission->getData('contextId')) ||
+            !$this->plugin->hasCrossrefCredentials($submission->getData('contextId')) ||
+            !$this->plugin->citationsEnabled($submission->getData('contextId'))) {
+
+                return Hook::CONTINUE;
+        }
 
         if ($submission->getData($this->getCitationsDiagnosticIdSettingName())) {
             $submission->setData($this->getCitationsDiagnosticIdSettingName(), null);
