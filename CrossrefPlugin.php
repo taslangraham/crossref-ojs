@@ -44,6 +44,7 @@ class CrossrefPlugin extends GenericPlugin implements IDoiRegistrationAgency, Ha
     private CrossrefSettings $_settingsObject;
     private ?CrossrefExportPlugin $_exportPlugin = null;
     private ?CrossrefCitationDoiHandler $_citationDoiHandler = null;
+    private ?CrossrefCitedBy $_citedBy = null;
 
     public function getDisplayName(): string
     {
@@ -82,12 +83,13 @@ class CrossrefPlugin extends GenericPlugin implements IDoiRegistrationAgency, Ha
             if ($this->getEnabled($mainContextId)) {
                 $this->_pluginInitialization();
                 $this->getCitationDoiHandler()->registerEnabledHooks();
+                $this->getCitedBy()->registerEnabledHooks();
+                $this->getCitedBy()->registerEndpoints();
             }
         }
 
         return $success;
     }
-
     /**
      * Remove plugin as configured registration agency if set at the time plugin is disabled.
      *
@@ -204,6 +206,14 @@ class CrossrefPlugin extends GenericPlugin implements IDoiRegistrationAgency, Ha
     public function getCitationDoiHandler(): CrossrefCitationDoiHandler
     {
         return $this->_citationDoiHandler ??= new CrossrefCitationDoiHandler($this);
+    }
+
+    /**
+     * Get the CrossrefCitedBy instance.
+     */
+    public function getCitedBy():CrossrefCitedBy
+    {
+        return $this->_citedBy ??=new CrossrefCitedBy($this);
     }
 
     /**
