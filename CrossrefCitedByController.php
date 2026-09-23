@@ -84,7 +84,9 @@ class CrossrefCitedByController extends PKPBaseController
         /** @var Submission $submission */
         $submission = Repo::submission()->get($submissionId, $context->getId());
 
-        if (!$submission) {
+        $publishedPublications = $submission?->getPublishedPublications();
+
+        if (!$submission || !$publishedPublications) {
             return response()->json([
                 'error' => __('api.404.resourceNotFound')
             ], Response::HTTP_NOT_FOUND);
@@ -102,7 +104,7 @@ class CrossrefCitedByController extends PKPBaseController
             $results = Cache::remember(
                 "crossref-citedBy-{$submissionId}",
                 60 * 60 * 24, // 1 day
-                fn() => $this->getCitedByCacheMiss($submission, $enabledRegistrationAgency, $context)
+                fn() => $this->getCitedByCacheMiss($publishedPublications, $enabledRegistrationAgency, $context)
             );
         } catch (Exception $e) {
             // When there is an error, Crossref includes the full URL which has the credentials in the error message.
@@ -122,9 +124,9 @@ class CrossrefCitedByController extends PKPBaseController
     /**
      * Fetches fresh data from Crossref API when there's a cache miss.
      */
-    protected function getCitedByCacheMiss(Submission $submission, IDoiRegistrationAgency $plugin, Context $context): array
+    protected function getCitedByCacheMiss(array $publishedPublications, IDoiRegistrationAgency $plugin, Context $context): array
     {
-        $dois = collect($submission->getPublishedPublications())
+        $dois = collect($publishedPublications)
             ->map(fn(Publication $publication) => $publication->getDoi())
             ->filter()
             ->unique(fn(string $doi) => strtolower($doi))
@@ -135,6 +137,8 @@ class CrossrefCitedByController extends PKPBaseController
         $httpClient = Application::get()->getHttpClient();
 
         $results = [];
+        libxml_use_internal_errors(true);
+
         foreach ($dois as $doi) {
             try {
                 $response = $httpClient->request(
@@ -183,6 +187,7 @@ class CrossrefCitedByController extends PKPBaseController
             }
         }
 
+        libxml_use_internal_errors(false);
         return array_values($results);
     }
 

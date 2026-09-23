@@ -27,13 +27,13 @@
 						<p :class="cn('citationSource')">
 							<span>
 								<template
-									v-for="(source, index) in getSourceLine(citation)"
+									v-for="(source, index) in store.getSourceLine(citation)"
 									:key="index"
 								>
 									<span>{{ source }}</span>
 									<span
 										:class="cn('citationSourceDelimiter')"
-										v-if="index < getSourceLine(citation).length - 1"
+										v-if="index < store.getSourceLine(citation).length - 1"
 									>
 										.
 									</span>
@@ -90,48 +90,4 @@ const props = defineProps({
 
 const {cn} = usePkpStyles('CrossrefCitedByBody', props.styles);
 const store = useCrossrefCitedByStore();
-
-function getSourceLine(citation) {
-	const source = [
-		citation?.journal,
-		citation?.institutionName,
-		citation.year,
-		getSourceLocator(citation),
-	];
-
-	return source.filter(Boolean);
-}
-
-function getSourceLocator(citation) {
-	const parts = [];
-
-	if (citation.volume) {
-		parts.push(
-			citation.issue
-				? t('plugins.generic.crossref.citedBy.citationSource.volumeWithIssue', {
-						volume: citation.volume,
-						issue: citation.issue,
-					})
-				: t('plugins.generic.crossref.citedBy.citationSource.volume', {
-						volume: citation.volume,
-					}),
-		);
-	} else if (citation.issue) {
-		parts.push(
-			t('plugins.generic.crossref.citedBy.citationSource.issueWithoutVolume', {
-				issue: citation.issue,
-			}),
-		);
-	}
-
-	if (citation.firstPage) {
-		parts.push(
-			t('plugins.generic.crossref.citedBy.citationSource.firstPage', {
-				page: citation.firstPage,
-			}),
-		);
-	}
-
-	return parts.join(', ');
-}
 </script>

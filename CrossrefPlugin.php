@@ -217,11 +217,7 @@ class CrossrefPlugin extends GenericPlugin implements IDoiRegistrationAgency, Ha
      */
     public function getCitedBy(): CrossrefCitedBy
     {
-        $contextId = $this->getCurrentContextId();
-        $contextDao = Application::getContextDAO();
-        $context = $contextDao->getById($contextId);
-
-        return $this->_citedBy ??= new CrossrefCitedBy($this, $context);
+        return $this->_citedBy ??= new CrossrefCitedBy($this, Application::get()->getRequest()->getContext());
     }
 
     /**

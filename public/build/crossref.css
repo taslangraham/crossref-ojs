@@ -25,9 +25,8 @@
 }
 
 .CrossrefCitedBy__viewCitations {
-    appearance: none;
     padding: 0;
-    border: 0;
+    border: none;
     background: transparent;
     cursor: pointer;
 }

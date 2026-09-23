@@ -44,27 +44,27 @@
 		const initialized = (0, vue.ref)(false);
 		const copiedToClipboard = (0, vue.ref)(false);
 		const styles = (0, vue.ref)({});
-		const nestedStyles = (0, vue.ref)({});
-		async function initialize(config, _nestedStyles = {}) {
+		async function initialize(config) {
 			if (!config) return;
 			styles.value = {
 				...styles.value,
 				...config.styles || {}
 			};
-			nestedStyles.value = {
-				...nestedStyles.value,
-				..._nestedStyles
-			};
 			if (initialized.value || isLoading.value) return;
 			const submissionId = config.submissionId;
 			const { apiUrl } = useUrl(`crossref/citedBy/${submissionId}`);
 			isLoading.value = true;
-			const { data, fetch } = usePkpFetch(apiUrl, { method: "GET" });
+			const { data, fetch, isSuccess } = usePkpFetch(apiUrl, {
+				method: "GET",
+				expectValidationError: true
+			});
 			await fetch();
-			citations.value = data.value.items;
-			total.value = data.value.itemsMax;
-			isLoading.value = false;
+			if (isSuccess.value) {
+				citations.value = data.value.items;
+				total.value = data.value.itemsMax;
+			}
 			initialized.value = true;
+			isLoading.value = false;
 		}
 		/**
 		* Build a plain-text summary of every citation (used by the
@@ -72,16 +72,11 @@
 		*/
 		function formatCitationForClipboard(citation, i) {
 			return [
-				i + 1,
-				getDoiExternalLink(citation?.doi),
-				citation.issue,
 				citation.title,
-				citation?.journal,
-				citation.year,
-				citation.volume,
 				citation.authors,
-				citation.firstPage
-			].filter(Boolean).join(" ");
+				...getSourceLine(citation),
+				citation.doi ? getDoiExternalLink(citation.doi) : ""
+			].join(t("common.commaListSeparator"));
 		}
 		/**
 		* Copy a plain-text summary of every fetched citation to the clipboard.
@@ -115,6 +110,24 @@
 		function getDoiExternalLink(doi) {
 			return `https://doi.org/${doi}`;
 		}
+		function getSourceLine(citation) {
+			return [
+				citation?.journal,
+				citation?.institutionName,
+				citation?.year,
+				getSourceLocator(citation)
+			].filter(Boolean);
+		}
+		function getSourceLocator(citation) {
+			const parts = [];
+			if (citation.volume) parts.push(citation.issue ? t("plugins.generic.crossref.citedBy.citationSource.volumeWithIssue", {
+				volume: citation.volume,
+				issue: citation.issue
+			}) : t("plugins.generic.crossref.citedBy.citationSource.volume", { volume: citation.volume }));
+			else if (citation.issue) parts.push(t("plugins.generic.crossref.citedBy.citationSource.issueWithoutVolume", { issue: citation.issue }));
+			if (citation.firstPage) parts.push(t("plugins.generic.crossref.citedBy.citationSource.firstPage", { page: citation.firstPage }));
+			return parts.join(t("common.commaListSeparator"));
+		}
 		return {
 			citations,
 			isLoading,
@@ -124,7 +137,8 @@
 			initialize,
 			openCitedByModal,
 			copyAllToClipboard,
-			getDoiExternalLink
+			getDoiExternalLink,
+			getSourceLine
 		};
 	});
 	//#endregion
@@ -148,24 +162,6 @@
 			const { usePkpStyles } = pkp.modules.usePkpStyles;
 			const { cn } = usePkpStyles("CrossrefCitedByBody", __props.styles);
 			const store = useCrossrefCitedByStore();
-			function getSourceLine(citation) {
-				return [
-					citation?.journal,
-					citation?.institutionName,
-					citation.year,
-					getSourceLocator(citation)
-				].filter(Boolean);
-			}
-			function getSourceLocator(citation) {
-				const parts = [];
-				if (citation.volume) parts.push(citation.issue ? t("plugins.generic.crossref.citedBy.citationSource.volumeWithIssue", {
-					volume: citation.volume,
-					issue: citation.issue
-				}) : t("plugins.generic.crossref.citedBy.citationSource.volume", { volume: citation.volume }));
-				else if (citation.issue) parts.push(t("plugins.generic.crossref.citedBy.citationSource.issueWithoutVolume", { issue: citation.issue }));
-				if (citation.firstPage) parts.push(t("plugins.generic.crossref.citedBy.citationSource.firstPage", { page: citation.firstPage }));
-				return parts.join(", ");
-			}
 			return (_ctx, _cache) => {
 				const _component_PkpButton = (0, vue.resolveComponent)("PkpButton");
 				return (0, vue.openBlock)(), (0, vue.createElementBlock)("div", { class: (0, vue.normalizeClass)((0, vue.unref)(cn)("root")) }, [
@@ -177,8 +173,8 @@
 						}, [(0, vue.createElementVNode)("div", { class: (0, vue.normalizeClass)((0, vue.unref)(cn)("citationsListItemContent")) }, [
 							(0, vue.createElementVNode)("h3", { class: (0, vue.normalizeClass)((0, vue.unref)(cn)("citationTitle")) }, (0, vue.toDisplayString)(citation.title), 3),
 							(0, vue.createElementVNode)("p", { class: (0, vue.normalizeClass)((0, vue.unref)(cn)("citationAuthors")) }, (0, vue.toDisplayString)(citation.authors), 3),
-							(0, vue.createElementVNode)("p", { class: (0, vue.normalizeClass)((0, vue.unref)(cn)("citationSource")) }, [(0, vue.createElementVNode)("span", null, [((0, vue.openBlock)(true), (0, vue.createElementBlock)(vue.Fragment, null, (0, vue.renderList)(getSourceLine(citation), (source, index) => {
-								return (0, vue.openBlock)(), (0, vue.createElementBlock)(vue.Fragment, { key: index }, [(0, vue.createElementVNode)("span", null, (0, vue.toDisplayString)(source), 1), index < getSourceLine(citation).length - 1 ? ((0, vue.openBlock)(), (0, vue.createElementBlock)("span", {
+							(0, vue.createElementVNode)("p", { class: (0, vue.normalizeClass)((0, vue.unref)(cn)("citationSource")) }, [(0, vue.createElementVNode)("span", null, [((0, vue.openBlock)(true), (0, vue.createElementBlock)(vue.Fragment, null, (0, vue.renderList)((0, vue.unref)(store).getSourceLine(citation), (source, index) => {
+								return (0, vue.openBlock)(), (0, vue.createElementBlock)(vue.Fragment, { key: index }, [(0, vue.createElementVNode)("span", null, (0, vue.toDisplayString)(source), 1), index < (0, vue.unref)(store).getSourceLine(citation).length - 1 ? ((0, vue.openBlock)(), (0, vue.createElementBlock)("span", {
 									key: 0,
 									class: (0, vue.normalizeClass)((0, vue.unref)(cn)("citationSourceDelimiter"))
 								}, " . ", 2)) : (0, vue.createCommentVNode)("", true)], 64);

@@ -15,6 +15,7 @@
 
 namespace APP\plugins\generic\crossref;
 
+use APP\publication\Publication;
 use APP\submission\Submission;
 use APP\template\TemplateManager;
 use PKP\core\APIRouter;
@@ -62,7 +63,7 @@ class CrossrefCitedBy
         $templateMgr = &$params[1];
         $output = &$params[2];
 
-        if (!self::isCitedByEnabled($this->context)) {
+        if (!$templateMgr->getTemplateVars('isCitedByEnabled')) {
             return Hook::CONTINUE;
         }
 
@@ -89,8 +90,14 @@ class CrossrefCitedBy
     public function setupCitedByComponents(string $hookName, array $params): bool
     {
         $request = $params[0];
-        $isCitedByEnabled = self::isCitedByEnabled($this->context);
         $templateMgr = TemplateManager::getManager($request);
+
+        /** @var Submission $article */
+        $article = &$params[2];
+
+        $articleHasPublishedDoi = array_any($article->getPublishedPublications(), fn(Publication $publication) => !!$publication->getDoi());
+
+        $isCitedByEnabled = self::isCitedByEnabled($this->context) && $articleHasPublishedDoi;
 
         if ($isCitedByEnabled) {
             $templateMgr->requiresVueRuntime();
@@ -122,8 +129,9 @@ class CrossrefCitedBy
             'plugins.generic.crossref.citedBy.viaCrossref',
             'plugins.generic.crossref.citedBy.viewCitingArticles',
             'plugins.generic.crossref.citedBy.thisArticleHasBeenCited',
-            'plugins.generic.crossref.citedBy.citeBy',
+            'plugins.generic.crossref.citedBy.citedBy',
             'plugins.generic.crossref.citedBy.citationSource.firstPage',
+            'common.commaListSeparator',
         ];
     }
 

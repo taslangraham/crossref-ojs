@@ -28,9 +28,8 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 	const initialized = ref(false);
 	const copiedToClipboard = ref(false);
 	const styles = ref({});
-	const nestedStyles = ref({});
 
-	async function initialize(config, _nestedStyles = {}) {
+	async function initialize(config) {
 		if (!config) {
 			return;
 		}
@@ -40,11 +39,6 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 			...styles.value,
 			...(config.styles || {}),
 		};
-
-		nestedStyles.value = {
-			...nestedStyles.value,
-			..._nestedStyles,
-		}
 
 		if (initialized.value || isLoading.value) {
 			return;
@@ -56,14 +50,20 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 
 		isLoading.value = true;
 
-		const {data, fetch} = usePkpFetch(apiUrl, {method: 'GET'});
+		const {data, fetch, isSuccess} = usePkpFetch(apiUrl, {
+			method: 'GET',
+			expectValidationError: true,
+		});
+
 		await fetch();
 
-		citations.value = data.value.items;
-		total.value = data.value.itemsMax;
+		if (isSuccess.value) {
+			citations.value = data.value.items;
+			total.value = data.value.itemsMax;
+		}
 
-		isLoading.value = false;
 		initialized.value = true;
+		isLoading.value = false;
 	}
 
 	/**
@@ -72,18 +72,13 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 	 */
 	function formatCitationForClipboard(citation, i) {
 		const parts = [
-			i + 1,
-			getDoiExternalLink(citation?.doi),
-			citation.issue,
 			citation.title,
-			citation?.journal,
-			citation.year,
-			citation.volume,
 			citation.authors,
-			citation.firstPage,
-		].filter(Boolean);
-		const text = parts.join(' ');
-		return text;
+			...getSourceLine(citation),
+			citation.doi ? getDoiExternalLink(citation.doi) : '',
+		];
+
+		return parts.join(t('common.commaListSeparator'));
 	}
 
 	/**
@@ -128,6 +123,56 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 		return `https://doi.org/${doi}`;
 	}
 
+	function getSourceLine(citation) {
+		const source = [
+			citation?.journal,
+			citation?.institutionName,
+			citation?.year,
+			getSourceLocator(citation),
+		];
+
+		return source.filter(Boolean);
+	}
+
+	function getSourceLocator(citation) {
+		const parts = [];
+
+		if (citation.volume) {
+			parts.push(
+				citation.issue
+					? t(
+							'plugins.generic.crossref.citedBy.citationSource.volumeWithIssue',
+							{
+								volume: citation.volume,
+								issue: citation.issue,
+							},
+						)
+					: t('plugins.generic.crossref.citedBy.citationSource.volume', {
+							volume: citation.volume,
+						}),
+			);
+		} else if (citation.issue) {
+			parts.push(
+				t(
+					'plugins.generic.crossref.citedBy.citationSource.issueWithoutVolume',
+					{
+						issue: citation.issue,
+					},
+				),
+			);
+		}
+
+		if (citation.firstPage) {
+			parts.push(
+				t('plugins.generic.crossref.citedBy.citationSource.firstPage', {
+					page: citation.firstPage,
+				}),
+			);
+		}
+
+		return parts.join(t('common.commaListSeparator'));
+	}
+
 	return {
 		citations,
 		isLoading,
@@ -138,5 +183,6 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 		openCitedByModal,
 		copyAllToClipboard,
 		getDoiExternalLink,
+		getSourceLine,
 	};
 });
