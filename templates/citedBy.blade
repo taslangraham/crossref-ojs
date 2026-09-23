@@ -8,6 +8,25 @@
  Cited-by on the article details page.
 --}}
 <section class="item crossref-cited-by" data-vue-root>
-    <h2 class="label">{{ __('plugins.generic.crossref.citedBy.citeBy') }}</h2>
-    <crossref-cited-by v-bind='@json($citedByConfig)'></crossref-cited-by>
+    <div class="CrossrefCitedBy__detailed">
+        <div class="CrossrefCitedBy__label">
+            <span>{{ __('plugins.generic.crossref.citedBy.thisArticleHasBeenCited') }}</span>
+            <span>
+                <strong>
+                    <crossref-cited-by-count v-bind='@json($citedByConfig)'></crossref-cited-by-count>
+                </strong>
+            </span>
+            <span>
+                {!! __('plugins.generic.crossref.citedBy.timesAccordingTo') !!}
+            </span>
+        </div>
+        <pkp-button class="CrossrefCitedBy__viewCitations"
+            @action='({pkp}) => {
+                    const s = pkp.registry.getPiniaStore("crossrefCitedBy");
+                    s.initialize(@json($citedByConfig))
+                    s.openCitedByModal();
+                }'>
+            {{ __('plugins.generic.crossref.citedBy.viewCitingArticles') }}
+        </pkp-button>
+    </div>
 </section>

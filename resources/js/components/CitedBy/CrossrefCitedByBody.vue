@@ -1,12 +1,12 @@
 <template>
 	<div :class="cn('root')">
-		<h5 :class="cn('count')">
+		<p :class="cn('count')">
 			{{
 				t('plugins.generic.crossref.citedBy.citationCount', {
 					count: store.total,
 				})
 			}}
-		</h5>
+		</p>
 
 		<div :class="cn('citationsWrapper')">
 			<ul :class="cn('citationsList')">
@@ -16,9 +16,9 @@
 					:class="cn('citationsListItem')"
 				>
 					<div :class="cn('citationsListItemContent')">
-						<h5 :class="cn('citationTitle')">
+						<h3 :class="cn('citationTitle')">
 							{{ citation.title }}
-						</h5>
+						</h3>
 
 						<p :class="cn('citationAuthors')">
 							{{ citation.authors }}
@@ -41,16 +41,16 @@
 							</span>
 						</p>
 
-						<a
-							v-if="citation.doi"
-							:href="store.getDoiExternalLink(citation.doi)"
-							target="_blank"
-							rel="noopener noreferrer"
-							:class="cn('citationDoi')"
-						>
-							{{ `doi.org/${citation.doi}` }}
-							<OpenNewTab icon="OpenNewTab" :class="cn('openIcon')" />
-						</a>
+						<p :class="cn('citationDoi')">
+							<a
+								v-if="citation.doi"
+								:href="store.getDoiExternalLink(citation.doi)"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{{ `doi.org/${citation.doi}` }}
+							</a>
+						</p>
 					</div>
 				</li>
 			</ul>
@@ -58,7 +58,7 @@
 
 		<div :class="cn('actions')">
 			<PkpButton
-				:class="cn('actionsCopyBtn')"
+				:class="cn('root')"
 				:is-disabled="store.isLoading || store.total < 1"
 				@click="store.copyAllToClipboard()"
 			>
@@ -69,7 +69,7 @@
 				}}
 			</PkpButton>
 
-			<PkpButton :class="cn('actionsCloseBtn')" @click="onClose">
+			<PkpButton :class="cn('root')" @click="onClose" :is-secondary="true">
 				{{ t('common.close') }}
 			</PkpButton>
 		</div>
@@ -78,7 +78,6 @@
 
 <script setup>
 import {useCrossrefCitedByStore} from './useCrossrefCitedByStore.js';
-import OpenNewTab from './icons/OpenNewTab.vue';
 
 const {usePkpLocalize} = pkp.modules.usePkpLocalize;
 const {t} = usePkpLocalize();

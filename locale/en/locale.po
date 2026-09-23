@@ -255,4 +255,7 @@ msgid "plugins.generic.crossref.citedBy.viewCitingArticles"
 msgstr "View citing articles"
 
 msgid "plugins.generic.crossref.citedBy.thisArticleHasBeenCited"
-msgstr "This article has been cited <strong>{$count} times</strong> according to Crossref"
+msgstr "This article has been cited "
+
+msgid "plugins.generic.crossref.citedBy.timesAccordingTo"
+msgstr " <strong>times</strong> according to Crossref"

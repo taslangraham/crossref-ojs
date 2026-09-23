@@ -9,25 +9,6 @@
  */
 
 /* =========== Basic Layout styles for cited-by components ============= */
-.CrossrefCitedBy__viewCitations {
-    cursor: pointer;
-}
-
-.CrossrefCitedBy__compact {
-    max-width: 20rem;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    border: 0.025rem solid black;
-    border-radius: 0.75rem;
-    position: relative;
-    padding-bottom: 2rem;
-}
-
-.CrossrefCitedBy__detailed{
-    max-width: 20rem;
-}
-
 .CrossrefCitedByBody__citationsListItemContent {
     margin-bottom: 2rem;
 }
@@ -41,12 +22,6 @@
     flex-direction: column;
     height: 100%;
     max-height: 80vh;
-}
-
-.CrossrefCitedByBody__openIcon {
-    width: 1rem;
-    height: 1rem;
-    margin-left: 2px;
 }
 
 .CrossrefCitedBy__viewCitations {
