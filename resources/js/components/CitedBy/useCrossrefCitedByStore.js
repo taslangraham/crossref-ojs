@@ -1,12 +1,13 @@
 import {ref} from 'vue';
 import CrossrefCitedByBody from './CrossrefCitedByBody.vue';
+import {defineStore} from 'pinia';
+
 const {usePkpFetch} = pkp.modules.usePkpFetch;
 const {usePkpModal} = pkp.modules.usePkpModal;
 const {usePkpLocalize} = pkp.modules.usePkpLocalize;
 const {useUrl} = pkp.modules.usePkpUrl;
 const {usePkpPageData} = pkp.modules.usePkpPageData;
 const {t} = usePkpLocalize();
-import {defineStore} from 'pinia';
 
 export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 	/**

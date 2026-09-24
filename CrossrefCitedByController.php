@@ -86,9 +86,18 @@ class CrossrefCitedByController extends PKPBaseController
 
         $publishedPublications = $submission?->getPublishedPublications();
 
-        if (!$submission || !$publishedPublications) {
+        if (!$submission) {
             return response()->json([
                 'error' => __('api.404.resourceNotFound')
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+
+        $articleHasPublishedDoi = array_any($submission->getPublishedPublications(), fn(Publication $publication) => !!$publication->getDoi());
+
+        if ($articleHasPublishedDoi) {
+            return response()->json([
+                'error' => __('plugins.generic.crossref.api.citedBy.noPublishedDois')
             ], Response::HTTP_NOT_FOUND);
         }
 
@@ -137,7 +146,7 @@ class CrossrefCitedByController extends PKPBaseController
         $httpClient = Application::get()->getHttpClient();
 
         $results = [];
-        libxml_use_internal_errors(true);
+        $prevXmlUseInternalError = libxml_use_internal_errors(true);
 
         foreach ($dois as $doi) {
             try {
@@ -187,7 +196,7 @@ class CrossrefCitedByController extends PKPBaseController
             }
         }
 
-        libxml_use_internal_errors(false);
+        libxml_use_internal_errors($prevXmlUseInternalError);
         return array_values($results);
     }
 

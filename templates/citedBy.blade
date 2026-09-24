@@ -8,21 +8,19 @@
  Cited-by on the article details page.
 --}}
 <section class="item crossref-cited-by" data-vue-root>
-    <div class="CrossrefCitedBy__detailed">
-        <div class="CrossrefCitedBy__label">
-            <span>{{ __('plugins.generic.crossref.citedBy.thisArticleHasBeenCited') }}</span>
-            <span>
-                <strong>
-                    <crossref-cited-by-count></crossref-cited-by-count>
-                </strong>
-            </span>
-            <span>
-                {!! __('plugins.generic.crossref.citedBy.timesAccordingTo') !!}
-            </span>
-        </div>
-        <pkp-button class="CrossrefCitedBy__viewCitations"
-            @action='({pkp}) => pkp.registry.getPiniaStore("crossrefCitedBy").openCitedByModal()'>
-            {{ __('plugins.generic.crossref.citedBy.viewCitingArticles') }}
-        </pkp-button>
+    <div class="CrossrefCitedBy__label">
+        <span>{{ __('plugins.generic.crossref.citedBy.thisArticleHasBeenCited') }}</span>
+        <span>
+            <strong>
+                <crossref-cited-by-count></crossref-cited-by-count>
+            </strong>
+        </span>
+        <span>
+            {!! __('plugins.generic.crossref.citedBy.timesAccordingTo') !!}
+        </span>
     </div>
+    <pkp-button class="CrossrefCitedBy__viewCitations"
+        @action='({pkp}) => pkp.registry.getPiniaStore("crossrefCitedBy").openCitedByModal()'>
+        {{ __('plugins.generic.crossref.citedBy.viewCitingArticles') }}
+    </pkp-button>
 </section>

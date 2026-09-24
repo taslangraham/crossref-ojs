@@ -150,21 +150,15 @@
 	var _hoisted_1 = ["href"];
 	var _sfc_main$1 = {
 		__name: "CrossrefCitedByBody",
-		props: {
-			styles: {
-				type: Object,
-				default: () => ({})
-			},
-			onClose: {
-				type: Function,
-				default: () => () => {}
-			}
-		},
+		props: { onClose: {
+			type: Function,
+			default: () => () => {}
+		} },
 		setup(__props) {
 			const { usePkpLocalize } = pkp.modules.usePkpLocalize;
 			const { t } = usePkpLocalize();
 			const { usePkpStyles } = pkp.modules.usePkpStyles;
-			const { cn } = usePkpStyles("CrossrefCitedByBody", __props.styles);
+			const { cn } = usePkpStyles("CrossrefCitedByBody");
 			const store = useCrossrefCitedByStore();
 			return (_ctx, _cache) => {
 				const _component_PkpButton = (0, vue.resolveComponent)("PkpButton");

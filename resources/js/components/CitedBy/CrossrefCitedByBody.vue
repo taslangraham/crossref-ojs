@@ -83,11 +83,10 @@ const {usePkpLocalize} = pkp.modules.usePkpLocalize;
 const {t} = usePkpLocalize();
 const {usePkpStyles} = pkp.modules.usePkpStyles;
 
-const props = defineProps({
-	styles: {type: Object, default: () => ({})},
+defineProps({
 	onClose: {type: Function, default: () => () => {}},
 });
 
-const {cn} = usePkpStyles('CrossrefCitedByBody', props.styles);
+const {cn} = usePkpStyles('CrossrefCitedByBody');
 const store = useCrossrefCitedByStore();
 </script>

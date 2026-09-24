@@ -206,10 +206,10 @@ msgstr "Journal publisher must be provided before submissions can be deposited w
 msgid "plugins.importexport.crossref.reviewTitle"
 msgstr "Review: {$publicationTitle} (Round{$revisionNumber}/Review{$reviewNumber})"
 
-msgid "plugins.generic.crossref.settings.form.enabledCitedBy"
+msgid "plugins.generic.crossref.settings.form.enableCitedBy"
 msgstr "Enable Cited-by"
 
-msgid "plugins.generic.crossref.settings.form.enabledCitedBy.description"
+msgid "plugins.generic.crossref.settings.form.enableCitedBy.description"
 msgstr "Enable Crossref Cited-by to retrieve citations found in Crossref for an article."
 
 msgid "plugins.generic.crossref.api.citedByNotEnabled"
@@ -259,3 +259,6 @@ msgstr "This article has been cited "
 
 msgid "plugins.generic.crossref.citedBy.timesAccordingTo"
 msgstr " <strong>times</strong> according to Crossref"
+
+msgid "plugins.generic.crossref.api.citedBy.noPublishedDois"
+msgstr "Cannot retrieve citations for this article because it does not have a published DOI."

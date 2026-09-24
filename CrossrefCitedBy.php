@@ -63,7 +63,7 @@ class CrossrefCitedBy
         $templateMgr = &$params[1];
         $output = &$params[2];
 
-        if (!$templateMgr->getTemplateVars('isCitedByEnabled')) {
+        if (!$templateMgr->getTemplateVars('isCitedByEnabled') || !$templateMgr->getTemplateVars('article')) {
             return Hook::CONTINUE;
         }
 
@@ -84,6 +84,10 @@ class CrossrefCitedBy
 
         /** @var Submission $article */
         $article = &$params[2];
+
+        if (!$article) {
+            return Hook::CONTINUE;
+        }
 
         $articleHasPublishedDoi = array_any($article->getPublishedPublications(), fn(Publication $publication) => !!$publication->getDoi());
 
@@ -127,6 +131,7 @@ class CrossrefCitedBy
             'plugins.generic.crossref.citedBy.citedBy',
             'plugins.generic.crossref.citedBy.citationSource.firstPage',
             'common.commaListSeparator',
+            'plugins.generic.crossref.api.citedBy.noPublishedDois',
         ];
     }
 

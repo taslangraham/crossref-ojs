@@ -13,6 +13,7 @@
     --base: 0.714rem;
     --half: 0.357rem;
 
+    /*Colours*/
     --primary: #006798;
     --primary-lift: #008acb;
 
@@ -38,10 +39,9 @@
 }
 
 /* =========== Styles for cited-by components ============= */
-.CrossrefCitedByBody__citationsListItemContent {
-    margin-bottom: 2rem;
-}
 
+/* --- Visual --- */
+/*Styles for the modal content*/
 .CrossrefCitedByBody__citationsWrapper {
     overflow-y: auto;
 }
@@ -64,11 +64,12 @@
     display: flex;
     gap: var(--base);
 }
+.CrossrefCitedByBody__citationsListItemContent {
+    margin-bottom: 2rem;
+}
 
-/* --- Visual --- */
-/*Styles for the modal content*/
 .CrossrefCitedByBody__citationsList {
-    list-style: none;
+    /*list-style: none;*/
     padding: 1.43rem;
 }
 
@@ -115,7 +116,6 @@
     border: none;
     background: transparent;
     cursor: pointer;
-
     font-family: var(--font);
     font-size: var(--font-base);
     line-height: var(--line-base);
@@ -139,6 +139,5 @@
 .CrossrefCitedByBody__citationDoi {
     margin: 0;
 }
-
 /* =========== End of styles for cited-by components ============= */
 /*$vite$:1*/
