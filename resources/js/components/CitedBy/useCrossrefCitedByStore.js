@@ -103,10 +103,8 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 
 	/**
 	 * Open the cited-by modal, listing every citation.
-	 * @param {Object} [options]
-	 * @param {Object} [options.dialogStyles] - Styles for CrossrefCitedByBody, which renders outside the page's component tree
 	 */
-	async function openCitedByModal({dialogStyles} = {}) {
+	async function openCitedByModal() {
 		await ensureCitationsLoaded();
 
 		if (!total.value) {
@@ -120,7 +118,6 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 			bodyComponent: CrossrefCitedByBody,
 			size: 'large',
 			bodyProps: {
-				styles: dialogStyles,
 				onClose: () => closeTopDialog(),
 			},
 		});
