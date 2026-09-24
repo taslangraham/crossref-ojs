@@ -67,16 +67,6 @@ class CrossrefCitedBy
             return Hook::CONTINUE;
         }
 
-        /** @var Submission $article */
-        $article = $templateMgr->getTemplateVars('article');
-        if (!$article) {
-            return Hook::CONTINUE;
-        }
-
-        $templateMgr->assign([
-            'citedByConfig' => ['submissionId' => $article->getId()],
-        ]);
-
         $output .= $templateMgr->fetch($this->plugin->getTemplateResource('citedBy'));
         return Hook::CONTINUE;
     }
@@ -102,9 +92,14 @@ class CrossrefCitedBy
         if ($isCitedByEnabled) {
             $templateMgr->requiresVueRuntime();
             $templateMgr->setLocaleKeys($this->getLocaleKeys());
+            $templateMgr->setPiniaStoreData('crossrefCitedBy', ['submissionId' => $article->getId()]);
 
             $this->plugin->loadCommonRuntimeScripts();
-            $this->plugin->loadCommonCrossrefStyles();
+
+            // Styles are written for the default theme; other themes style the components themselves
+            if ($this->plugin->isThemeActive('defaultthemeplugin')) {
+                $this->plugin->loadCommonCrossrefStyles();
+            }
         }
 
         $templateMgr->assign('isCitedByEnabled', $isCitedByEnabled);

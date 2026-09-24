@@ -13,7 +13,7 @@
             <span>{{ __('plugins.generic.crossref.citedBy.thisArticleHasBeenCited') }}</span>
             <span>
                 <strong>
-                    <crossref-cited-by-count v-bind='@json($citedByConfig)'></crossref-cited-by-count>
+                    <crossref-cited-by-count></crossref-cited-by-count>
                 </strong>
             </span>
             <span>
@@ -21,11 +21,7 @@
             </span>
         </div>
         <pkp-button class="CrossrefCitedBy__viewCitations"
-            @action='({pkp}) => {
-                    const s = pkp.registry.getPiniaStore("crossrefCitedBy");
-                    s.initialize(@json($citedByConfig))
-                    s.openCitedByModal();
-                }'>
+            @action='({pkp}) => pkp.registry.getPiniaStore("crossrefCitedBy").openCitedByModal()'>
             {{ __('plugins.generic.crossref.citedBy.viewCitingArticles') }}
         </pkp-button>
     </div>

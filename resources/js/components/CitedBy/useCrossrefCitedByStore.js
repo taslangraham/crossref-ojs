@@ -4,10 +4,18 @@ const {usePkpFetch} = pkp.modules.usePkpFetch;
 const {usePkpModal} = pkp.modules.usePkpModal;
 const {usePkpLocalize} = pkp.modules.usePkpLocalize;
 const {useUrl} = pkp.modules.usePkpUrl;
+const {usePkpPageData} = pkp.modules.usePkpPageData;
 const {t} = usePkpLocalize();
 import {defineStore} from 'pinia';
 
 export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
+	/**
+	 * Init data passed from the server via
+	 * TemplateManager::setPiniaStoreData('crossrefCitedBy', ...)
+	 * @type {{submissionId?: number}}
+	 */
+	const {submissionId} = usePkpPageData().getStoreData('crossrefCitedBy');
+
 	/**
 	 * @type {Array<{
 	 *   title: string|null,
@@ -25,26 +33,22 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 	const citations = ref([]);
 	const total = ref(0);
 	const isLoading = ref(false);
-	const initialized = ref(false);
 	const copiedToClipboard = ref(false);
-	const styles = ref({});
+	let loadPromise = null;
 
-	async function initialize(config) {
-		if (!config) {
+	/**
+	 * Fetch the citations. Called by the components displaying them;
+	 * they are fetched only once, however many components call it.
+	 */
+	function ensureCitationsLoaded() {
+		loadPromise ??= loadCitations();
+		return loadPromise;
+	}
+
+	async function loadCitations() {
+		if (!submissionId) {
 			return;
 		}
-
-		// Store is used by multiple components, so allow component to still be able to set styles even if the store was initialized by another component
-		styles.value = {
-			...styles.value,
-			...(config.styles || {}),
-		};
-
-		if (initialized.value || isLoading.value) {
-			return;
-		}
-
-		const submissionId = config.submissionId;
 
 		const {apiUrl} = useUrl(`crossref/citedBy/${submissionId}`);
 
@@ -62,7 +66,6 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 			total.value = data.value.itemsMax;
 		}
 
-		initialized.value = true;
 		isLoading.value = false;
 	}
 
@@ -100,8 +103,12 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 
 	/**
 	 * Open the cited-by modal, listing every citation.
+	 * @param {Object} [options]
+	 * @param {Object} [options.dialogStyles] - Styles for CrossrefCitedByBody, which renders outside the page's component tree
 	 */
-	function openCitedByModal() {
+	async function openCitedByModal({dialogStyles} = {}) {
+		await ensureCitationsLoaded();
+
 		if (!total.value) {
 			return;
 		}
@@ -113,7 +120,7 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 			bodyComponent: CrossrefCitedByBody,
 			size: 'large',
 			bodyProps: {
-				styles: styles.value.CrossrefCitedByBody,
+				styles: dialogStyles,
 				onClose: () => closeTopDialog(),
 			},
 		});
@@ -176,10 +183,9 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 	return {
 		citations,
 		isLoading,
-		initialized,
 		copiedToClipboard,
 		total,
-		initialize,
+		ensureCitationsLoaded,
 		openCitedByModal,
 		copyAllToClipboard,
 		getDoiExternalLink,
