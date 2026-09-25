@@ -120,18 +120,12 @@ class CrossrefCitedBy
             'common.close',
             'common.copied',
             'plugins.generic.crossref.citedBy.title',
-            'plugins.generic.crossref.registrationAgency.name',
             'plugins.generic.crossref.citedBy.citationCount',
             'plugins.generic.crossref.citedBy.citationSource.issueWithoutVolume',
             'plugins.generic.crossref.citedBy.citationSource.volumeWithIssue',
             'plugins.generic.crossref.citedBy.citationSource.volume',
-            'plugins.generic.crossref.citedBy.viaCrossref',
-            'plugins.generic.crossref.citedBy.viewCitingArticles',
-            'plugins.generic.crossref.citedBy.thisArticleHasBeenCited',
-            'plugins.generic.crossref.citedBy.citedBy',
             'plugins.generic.crossref.citedBy.citationSource.firstPage',
             'common.commaListSeparator',
-            'plugins.generic.crossref.api.citedBy.noPublishedDois',
         ];
     }
 

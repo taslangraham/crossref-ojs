@@ -84,8 +84,6 @@ class CrossrefCitedByController extends PKPBaseController
         /** @var Submission $submission */
         $submission = Repo::submission()->get($submissionId, $context->getId());
 
-        $publishedPublications = $submission?->getPublishedPublications();
-
         if (!$submission) {
             return response()->json([
                 'error' => __('api.404.resourceNotFound')
@@ -93,9 +91,10 @@ class CrossrefCitedByController extends PKPBaseController
         }
 
 
+        $publishedPublications = $submission?->getPublishedPublications();
         $articleHasPublishedDoi = array_any($submission->getPublishedPublications(), fn(Publication $publication) => !!$publication->getDoi());
 
-        if ($articleHasPublishedDoi) {
+        if (!$articleHasPublishedDoi) {
             return response()->json([
                 'error' => __('plugins.generic.crossref.api.citedBy.noPublishedDois')
             ], Response::HTTP_NOT_FOUND);
