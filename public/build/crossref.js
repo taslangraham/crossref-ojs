@@ -50,6 +50,11 @@
 		const isLoading = (0, vue.ref)(false);
 		const copiedToClipboard = (0, vue.ref)(false);
 		let loadPromise = null;
+		const hasError = (0, vue.ref)(false);
+		const totalDisplay = (0, vue.computed)(() => {
+			if (hasError.value || isLoading.value) return "--";
+			return total.value;
+		});
 		/**
 		* Fetch the citations. Called by the components displaying them;
 		* they are fetched only once, however many components call it.
@@ -70,7 +75,8 @@
 			if (isSuccess.value) {
 				citations.value = data.value.items;
 				total.value = data.value.itemsMax;
-			}
+				hasError.value = false;
+			} else hasError.value = true;
 			isLoading.value = false;
 		}
 		/**
@@ -137,7 +143,7 @@
 			citations,
 			isLoading,
 			copiedToClipboard,
-			total,
+			totalDisplay,
 			ensureCitationsLoaded,
 			openCitedByModal,
 			copyAllToClipboard,
@@ -212,7 +218,7 @@
 			const store = useCrossrefCitedByStore();
 			store.ensureCitationsLoaded();
 			return (_ctx, _cache) => {
-				return (0, vue.toDisplayString)((0, vue.unref)(store).total);
+				return (0, vue.toDisplayString)((0, vue.unref)(store).totalDisplay);
 			};
 		}
 	};

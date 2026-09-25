@@ -1,5 +1,5 @@
 <template>
-	{{ store.total }}
+	{{ store.totalDisplay }}
 </template>
 
 <script setup>

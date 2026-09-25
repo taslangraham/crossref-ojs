@@ -1,4 +1,4 @@
-import {ref} from 'vue';
+import {ref, computed} from 'vue';
 import CrossrefCitedByBody from './CrossrefCitedByBody.vue';
 import {defineStore} from 'pinia';
 
@@ -36,7 +36,14 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 	const isLoading = ref(false);
 	const copiedToClipboard = ref(false);
 	let loadPromise = null;
+	const hasError = ref(false);
 
+	const totalDisplay = computed(() => {
+		if (hasError.value || isLoading.value) {
+			return '--';
+		}
+		return total.value;
+	});
 	/**
 	 * Fetch the citations. Called by the components displaying them;
 	 * they are fetched only once, however many components call it.
@@ -65,6 +72,9 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 		if (isSuccess.value) {
 			citations.value = data.value.items;
 			total.value = data.value.itemsMax;
+			hasError.value = false;
+		} else {
+			hasError.value = true;
 		}
 
 		isLoading.value = false;
@@ -182,7 +192,7 @@ export const useCrossrefCitedByStore = defineStore('crossrefCitedBy', () => {
 		citations,
 		isLoading,
 		copiedToClipboard,
-		total,
+		totalDisplay,
 		ensureCitationsLoaded,
 		openCitedByModal,
 		copyAllToClipboard,
